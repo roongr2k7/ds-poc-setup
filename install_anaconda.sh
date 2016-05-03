@@ -1,10 +1,17 @@
 #!/bin/sh
 
-ANACONDA_URL=http://repo.continuum.io/archive/Anaconda2-4.0.0-Linux-x86_64.sh
-ANACONDA_SCRIPT=`basename $ANACONDA_URL`
+MINICONDA_URL=https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh
+MINICONDA_SCRIPT=`basename $MINICONDA_URL`
+MINICONDA_HOME="/home/vagrant/miniconda"
 
-if [ ! -f "./$ANACONDA_SCRIPT" ] ; then
-  wget $ANACONDA_URL
+if [ ! -f "./$MINICONDA_SCRIPT" ] ; then
+  wget $MINICONDA_URL
 fi
 
-bash $ANACONDA_SCRIPT
+bash -b -p $MINICONDA_HOME $MINICONDA_SCRIPT
+chown -R vagrant:vagrant $MINICONDA_HOME
+
+cat >> /home/vagrant/.bashrc <<- EOM
+# Appended by miniconda setup
+export PATH="$MINICONDA_HOME/bin:\$PATH"
+EOM
