@@ -1,5 +1,5 @@
 #!/bin/bash
-apt-get install software-properties-common  
-apt-add-repository ppa:git-core/ppa
-apt-get update
-apt-get install git
+sudo apt-get install software-properties-common  
+sudo apt-add-repository ppa:git-core/ppa
+sudo apt-get update
+sudo apt-get install git
