@@ -1,18 +1,17 @@
-#!/bin/sh
+#!/bin/bash
 
-# Perform all operations in temporary directories
-cd /tmp
+SPARK_DOWNLOAD_URL=http://d3kbcqa49mib13.cloudfront.net/spark-2.0.2-bin-hadoop2.7.tgz
 
-# Load spark package and extract it
-if [ ! -d "./spark" ] ; then
-  [ ! -e "./spark-1.6.1-bin-hadoop2.6.tgz" ] && wget http://d3kbcqa49mib13.cloudfront.net/spark-1.6.1-bin-hadoop2.6.tgz
-  tar zxf spark-1.6.1-bin-hadoop2.6.tgz
-  sudo mv spark-1.6.1-bin-hadoop2.6 spark
+source function.sh
+
+if [[ `which javac`X = 'X' ]]; then
+  echo install openjdk-8-jdk
+  sudo apt install -y openjdk-8-jdk
 fi
 
-# Clean existing spark home
-sudo rm -rf /opt/spark
-sudo mv -f spark /opt
+download $SPARK_DOWNLOAD_URL
+tar zxf `basename $SPARK_DOWNLOAD_URL`
+sudo mv `basename $SPARK_DOWNLOAD_URL .tgz` /opt/spark
 
 # Assign SPARK_HOME environment variable
 sudo cat > /etc/profile.d/Z11-spark-home-env.sh <<- EOF
