@@ -1,0 +1,25 @@
+#!/bin/bash
+
+if [[ ! `whoami` = 'root' ]]; then
+  echo require root privilege, please execute script by
+  echo "  sudo $0"
+  exit 1
+fi
+
+cat <<EOF > /lib/systemd/system/riemann-dash.service
+[Unit]
+Description=Riemann Dashboard Service
+After=network.target
+
+[Service]
+WorkingDirectory=/etc/riemann
+ExecStart=/usr/local/bin/riemann-dash
+ExecStop=/usr/bin/killall riemann-dash
+
+[Install]
+WantedBy=multi-user.target
+
+EOF
+
+systemctl enable riemann-dash.service
+systemctl start riemann-dash.service
