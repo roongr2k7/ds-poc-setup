@@ -20,3 +20,18 @@ function download {
     wget $1
   fi
 }
+
+function require_openjdk {
+# version=$1
+  if [[ `which javac`X = 'X' ]]; then
+    echo install openjdk-$1-jdk
+    sudo apt install -y openjdk-$1-jdk
+  fi
+}
+
+function extract {
+# file=$1
+# dest_path=$2
+  sudo tar zxf `basename $1` --directory `dirname $2`
+  sudo ln -s `basename $1 .tgz` $2
+} 
