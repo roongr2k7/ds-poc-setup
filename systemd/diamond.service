@@ -1,0 +1,13 @@
+[Unit]
+Description=Diamond metric collector
+After=network.target
+
+[Service]
+User=root
+Type=forking
+PIDFile=/var/run/diamond.pid
+
+ExecStart=/usr/local/bin/diamond -c /etc/diamond/diamond.conf
+
+[Install]
+WantedBy=multi-user.target
