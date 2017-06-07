@@ -1,0 +1,28 @@
+jenkins_process = Process(name='jenkins_process', cmdline='export JENKINS_HOME=/var/jenkins_home;export JENKINS_SLAVE_AGENT_PORT=50000;java -jar /usr/share/jenkins/jenkins.war')                                                                            
+
+jenkins_task = Task(                                     
+  resources=Resources(cpu=1, ram=4 * GB, disk= 200 * MB),                                                          
+  processes = [jenkins_process])                         
+
+jenkins_service = Service(                               
+  name='jenkins_service',                                
+  cluster='mkax',                                        
+  environment = 'devel',                                 
+  role='jenkins',                                        
+  constraints = {                                        
+    'hostname': 'folk4.mkax.local'                       
+  },                                                     
+  task=jenkins_task,                                     
+  container=Docker(                                      
+    image='{{docker.image[roongr2k7/mesos-jenkins][latest]}}',                                                     
+    parameters=[                                         
+      Parameter(name='network', value='host'),           
+      Parameter(name='volumes-from', value='jenkins_home'),                                                        
+    ]                                                    
+  ),                                                     
+  health_check_config=HealthCheckConfig(health_checker=HealthCheckerConfig(                                        
+     shell=ShellHealthChecker(shell_command="curl --write-out '%{http_code}\n' -f -s -o /dev/null  http://folk4.mkax.local:8080/login")                                                                                               
+  ))                                                     
+)                                                        
+
+jobs = [jenkins_service]                        
