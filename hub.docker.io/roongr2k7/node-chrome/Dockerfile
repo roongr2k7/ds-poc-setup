@@ -1,6 +1,6 @@
 FROM ubuntu:16.04
 
-RUN apt-get update && apt-get install -y wget
+RUN apt-get update && apt-get install -y wget xz-utils
 
 RUN wget https://nodejs.org/dist/v6.11.0/node-v6.11.0-linux-x64.tar.xz
 RUN tar -C /usr/local --strip-components 1 -xf node-v6.11.0-linux-x64.tar.xz
