@@ -1,9 +1,11 @@
 #!/bin/bash
 JUPYTERHUB_USER=jupyterhub
 JUPYTERHUB_GROUP=jupyterhub
+JUPYTERHUB_HOME=/var/lib/${JUPYTERHUB_USER}
 USERS="donatello leonardo michelangelo raphael splinter"
 SUDOER_FILE=/etc/sudoers.d/17-jupyterhub-users
 JUPYTERHUB_CONFIG_FILE=/etc/jupyterhub_config.py
+JUPYTERHUB_SERVICE_FILE=/lib/systemd/system/jupyterhub.service
 
 # install jupyterhub and notebook
 sudo apt-get update
@@ -13,7 +15,7 @@ sudo pip3 install --upgrade pip
 sudo pip3 install --upgrade jupyterhub notebook
 
 # add user
-sudo useradd ${JUPYTERHUB_USER}
+sudo useradd -m -d ${JUPYTERHUB_HOME} ${JUPYTERHUB_USER}
 for user in ${USERS}; do
   sudo useradd -m -p $(openssl passwd -1 pizzaninjaturtles) -s /bin/bash -G ${JUPYTERHUB_GROUP} ${user}
 done
@@ -33,3 +35,32 @@ cat <<EOT | sudo tee ${JUPYTERHUB_CONFIG_FILE}
 c.JupyterHub.spawner_class = 'sudospawner.SudoSpawner'
 c.Spawner.cmd = ['/usr/local/bin/sudospawner']
 EOT
+
+# create systemd service
+
+sudo -u jupyterhub mkdir -p ${JUPYTERHUB_HOME}/bin
+
+cat <<EOT | sudo -u ${JUPYTERHUB_USER} tee ${JUPYTERHUB_HOME}/bin/start.sh
+#!/bin/bash
+jupyterhub -f ${JUPYTERHUB_CONFIG_FILE}
+EOT
+
+sudo chmod +x ${JUPYTERHUB_HOME}/bin/start.sh
+
+cat <<EOT | sudo tee ${JUPYTERHUB_SERVICE_FILE}
+[Unit]
+Description=JupyterHub Service
+After=network.target
+
+[Service]
+User=jupyterhub
+Group=jupyterhub
+ExecStart=${JUPYTERHUB_HOME}/bin/start.sh
+WorkingDirectory=${JUPYTERHUB_HOME}
+
+[Install]
+WantedBy=multi-user.target
+EOT
+
+sudo systemctl enable jupyterhub
+sudo systemctl start jupyterhub
