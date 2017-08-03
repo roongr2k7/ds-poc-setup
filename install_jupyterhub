@@ -15,7 +15,7 @@ sudo pip3 install --upgrade jupyterhub notebook
 # add user
 sudo useradd ${JUPYTERHUB_USER}
 for user in ${USERS}; do
-  sudo useradd -m -p $(openssl passwd -1 pizzaninjaturtles) -s /bin/bash -G ${JUPYTERHUB_GROUP} ${USER}
+  sudo useradd -m -p $(openssl passwd -1 pizzaninjaturtles) -s /bin/bash -G ${JUPYTERHUB_GROUP} ${user}
 done
 
 # configure jupyterhub to run without root privileges
