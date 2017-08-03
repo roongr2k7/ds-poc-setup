@@ -1,7 +1,7 @@
 #!/bin/bash
 JUPYTERHUB_USER=jupyterhub
 JUPYTERHUB_GROUP=jupyterhub
-USERS="donatello leonardo mechelangelo raphael splinter"
+USERS="donatello leonardo michelangelo raphael splinter"
 SUDOER_FILE=/etc/sudoers.d/17-jupyterhub-users
 JUPYTERHUB_CONFIG_FILE=/etc/jupyterhub_config.py
 
@@ -22,7 +22,7 @@ done
 sudo pip3 install sudospawner
 sudo usermod -aG shadow ${JUPYTERHUB_USER}
 
-cat <<EOT | sudo tee 17-jupyterhub-users
+cat <<EOT | sudo tee 17-jupyterhub-users.tmp
 Runas_Alias JUPYTER_USERS = `echo ${USERS} | sed -e 's/ /, /g'`
 Cmnd_Alias JUPYTER_CMD = /usr/local/bin/sudospawner
 jupyterhub ALL=(JUPYTER_USERS) NOPASSWD:JUPYTER_CMD
