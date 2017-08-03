@@ -1,0 +1,33 @@
+#!/bin/bash                                              
+JUPYTERHUB_USER=jupyterhub                               
+JUPYTERHUB_GROUP=jupyterhub                              
+USERS="donatello leonardo mechelangelo raphael splinter" 
+SUDOER_FILE=/etc/sudoers.d/17-jupyterhub-users           
+JUPYTERHUB_CONFIG_FILE=/etc/jupyterhub_config.py         
+
+# install jupyterhub and notebook                        
+sudo apt-get update                                      
+sudo apt-get install -y npm nodejs-legacy python3-pip    
+sudo npm install -g configurable-http-proxy              
+sudo pip3 install --upgrade pip                          
+sudo pip3 install --upgrade jupyterhub notebook          
+
+# add user and force to change password upon first login 
+for user in ${USERS}; do                                 
+  sudo useradd -m -p $(openssl passwd -1 pizzaninjaturtles) -s /bin/bash -G ${JUPYTERHUB_GROUP} ${USER}           
+done                                                     
+
+# configure jupyterhub to run without root privileges    
+sudo pip3 install sudospawner                            
+sudo usermod -aG shadow ${JUPYTERHUB_USER}               
+
+cat <<EOT | sudo tee ${SUDOER_FILE}                      
+Runas_Alias JUPYTER_USERS = `echo ${USERS} | sed -e 's/ /, /g'`
+Cmnd_Alias JUPYTER_CMD = /usr/local/bin/sudospawner      
+jupyterhub ALL=(JUPYTER_USERS) NOPASSWD:JUPYTER_CMD      
+EOT                                                      
+
+cat <<EOT | sudo tee ${JUPYTERHUB_CONFIG_FILE}           
+c.JupyterHub.spawner_class = 'sudospawner.SudoSpawner'   
+c.Spawner.cmd = ['/usr/local/bin/sudospawner']           
+EOT  
