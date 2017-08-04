@@ -9,7 +9,7 @@ JUPYTERHUB_SERVICE_FILE=/lib/systemd/system/jupyterhub.service
 
 # install jupyterhub and notebook
 sudo apt-get update
-sudo apt-get install -y npm nodejs-legacy python3-pip
+sudo apt-get install -y npm nodejs-legacy python3-pip python3-venv
 sudo npm install -g configurable-http-proxy
 sudo pip3 install --upgrade pip
 sudo pip3 install --upgrade jupyterhub notebook
