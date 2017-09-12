@@ -1,0 +1,12 @@
+#!/bin/bash
+mode=$1
+topics="Price|BidOffer"
+
+mkdir -p /home/mka/kafka-mirror/logs
+
+sudo -u kafka /opt/kafka/bin/kafka-run-class.sh kafka.tools.MirrorMaker \
+  --consumer.config /home/mka/kafka-mirror/conf/consumer-${mode}.properties \
+  --producer.config /home/mka/kafka-mirror/conf/producer-${mode}.properties \
+  --num.streams 4 \
+  --offset.commit.interval.ms 1000 \
+  --whitelist "${topics}" &>> /home/mka/kafka-mirror/logs/mirror-${mode}.log
